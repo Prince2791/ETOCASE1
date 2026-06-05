@@ -1,0 +1,1237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Seligram ETO Cost-System Challenge</title>
+  <style>
+    :root {
+      --bg: #f5f7fb;
+      --card: #ffffff;
+      --ink: #172033;
+      --muted: #5c667a;
+      --line: #dde3ef;
+      --accent: #273f88;
+      --accent2: #0f766e;
+      --danger: #9f1239;
+      --warn: #92400e;
+      --good: #166534;
+      --soft: #eef2ff;
+      --soft2: #ecfdf5;
+      --shadow: 0 10px 30px rgba(20, 30, 60, 0.10);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(39,63,136,0.12), transparent 34%),
+        radial-gradient(circle at bottom right, rgba(15,118,110,0.12), transparent 32%),
+        var(--bg);
+      color: var(--ink);
+      line-height: 1.5;
+    }
+
+    .app {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 28px 18px 44px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    .brand {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .kicker {
+      color: var(--accent2);
+      font-weight: 800;
+      font-size: 13px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(28px, 4vw, 46px);
+      letter-spacing: -0.04em;
+      line-height: 1.02;
+    }
+
+    h2 {
+      margin: 0 0 10px;
+      font-size: clamp(22px, 3vw, 32px);
+      letter-spacing: -0.025em;
+    }
+
+    h3 {
+      margin: 0 0 8px;
+      font-size: 18px;
+    }
+
+    p { margin: 0 0 12px; }
+
+    .pill {
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.75);
+      padding: 9px 12px;
+      border-radius: 999px;
+      color: var(--muted);
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .sidebar, .screen, .panel {
+      background: rgba(255,255,255,0.92);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+    }
+
+    .sidebar {
+      padding: 16px;
+      position: sticky;
+      top: 16px;
+    }
+
+    .progress {
+      display: grid;
+      gap: 10px;
+      margin: 12px 0 16px;
+    }
+
+    .step {
+      display: grid;
+      grid-template-columns: 28px 1fr;
+      gap: 9px;
+      align-items: center;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .dot {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--line);
+      background: #fff;
+      font-weight: 800;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .step.active .dot {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+
+    .step.done .dot {
+      background: var(--accent2);
+      color: #fff;
+      border-color: var(--accent2);
+    }
+
+    .scorebox {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 12px;
+      background: #fbfcff;
+      margin-top: 12px;
+    }
+
+    .scorebig {
+      font-size: 36px;
+      font-weight: 900;
+      letter-spacing: -0.04em;
+      color: var(--accent);
+    }
+
+    .small {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .screen {
+      display: none;
+      padding: clamp(18px, 3vw, 30px);
+      min-height: 620px;
+    }
+
+    .screen.active { display: block; }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 18px;
+      align-items: stretch;
+    }
+
+    .panel {
+      padding: 18px;
+      box-shadow: none;
+    }
+
+    .callout {
+      border-left: 5px solid var(--accent);
+      background: var(--soft);
+      padding: 14px 16px;
+      border-radius: 12px;
+      margin: 14px 0;
+    }
+
+    .warning {
+      border-left-color: var(--warn);
+      background: #fff7ed;
+    }
+
+    .good {
+      border-left-color: var(--good);
+      background: #f0fdf4;
+    }
+
+    .grid2 {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .grid3 {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    label {
+      display: block;
+      font-weight: 750;
+      margin-bottom: 6px;
+      font-size: 14px;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 12px 12px;
+      font-size: 15px;
+      background: #fff;
+      color: var(--ink);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 90px;
+    }
+
+    .btnrow {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 12px;
+      padding: 12px 16px;
+      font-weight: 800;
+      cursor: pointer;
+      background: var(--accent);
+      color: white;
+      box-shadow: 0 6px 15px rgba(39,63,136,0.16);
+      font-size: 14px;
+    }
+
+    button.secondary {
+      background: #ffffff;
+      color: var(--ink);
+      border: 1px solid var(--line);
+      box-shadow: none;
+    }
+
+    button.ghost {
+      background: transparent;
+      color: var(--accent);
+      box-shadow: none;
+      border: 1px dashed var(--line);
+    }
+
+    button:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+
+    .choice {
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 15px;
+      background: #fff;
+      cursor: pointer;
+      transition: transform 0.12s ease, border-color 0.12s ease, background 0.12s ease;
+      min-height: 126px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .choice:hover {
+      transform: translateY(-2px);
+      border-color: rgba(39,63,136,0.45);
+    }
+
+    .choice.selected {
+      border-color: var(--accent);
+      background: #eef2ff;
+      box-shadow: inset 0 0 0 1px var(--accent);
+    }
+
+    .choice.correct {
+      border-color: var(--good);
+      background: #f0fdf4;
+    }
+
+    .choice.wrong {
+      border-color: var(--danger);
+      background: #fff1f2;
+    }
+
+    .tag {
+      display: inline-flex;
+      width: fit-content;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: #edf2f7;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .meter {
+      width: 100%;
+      height: 10px;
+      border-radius: 999px;
+      background: #e5e7eb;
+      overflow: hidden;
+      margin-top: 8px;
+    }
+
+    .bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      transition: width 0.35s ease;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+      border-radius: 14px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      font-size: 14px;
+    }
+
+    th, td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--line);
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    th:first-child, td:first-child { text-align: left; }
+
+    th {
+      background: #f8fafc;
+      color: #334155;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    tr:last-child td { border-bottom: 0; }
+
+    .delta-up { color: var(--danger); font-weight: 800; }
+    .delta-down { color: var(--good); font-weight: 800; }
+
+    .feedback {
+      margin-top: 14px;
+      padding: 14px;
+      border-radius: 14px;
+      background: #f8fafc;
+      border: 1px solid var(--line);
+      display: none;
+    }
+
+    .feedback.show { display: block; }
+
+    .mini {
+      display: grid;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .minirow {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      border-bottom: 1px dashed var(--line);
+      padding-bottom: 7px;
+      font-size: 13px;
+    }
+
+    .minirow:last-child {
+      border-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .resultcard {
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 16px;
+      background: #fff;
+    }
+
+    .confetti {
+      font-size: 48px;
+      line-height: 1;
+      margin-bottom: 10px;
+    }
+
+    .hidden { display: none !important; }
+
+    .footer-note {
+      margin-top: 22px;
+      padding-top: 14px;
+      border-top: 1px solid var(--line);
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    @media (max-width: 900px) {
+      .layout, .hero, .grid2, .grid3 {
+        grid-template-columns: 1fr;
+      }
+      .sidebar {
+        position: static;
+      }
+      .topbar {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+      th, td { white-space: normal; }
+    }
+
+    @media print {
+      body { background: white; }
+      .sidebar, .btnrow, .topbar .pill { display: none; }
+      .layout { display: block; }
+      .screen { display: block !important; page-break-after: always; box-shadow: none; border: none; }
+      .screen:not(.active) { display: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="topbar">
+      <div class="brand">
+        <div class="kicker">Online case game prototype</div>
+        <h1>Seligram ETO Cost-System Challenge</h1>
+      </div>
+      <div class="pill">GitHub Pages version - score tracking through Google Sheets</div>
+    </div>
+
+    <div class="layout">
+      <aside class="sidebar">
+        <h3>Game dashboard</h3>
+        <p class="small">Use this after students have access to the official case. The game is a decision companion, not a copy of the case.</p>
+
+        <div class="progress" id="progress"></div>
+
+        <div class="scorebox">
+          <div class="small">Current score</div>
+          <div><span class="scorebig" id="scoreNow">0</span><span class="small"> / 120</span></div>
+          <div class="meter"><div class="bar" id="scoreBar"></div></div>
+        </div>
+
+        <div class="scorebox">
+          <div class="small">Team</div>
+          <strong id="sideTeam">Not set</strong>
+          <div class="small" id="sideRole">Role not selected</div>
+        </div>
+
+        <div class="footer-note">
+          Instructor tip: keep the game fast. The debrief is where the accounting learning happens.
+        </div>
+      </aside>
+
+      <main>
+        <section class="screen active" id="screen0">
+          <div class="hero">
+            <div>
+              <h2>Welcome to the boardroom.</h2>
+              <p>You are advising ETO management. The old costing system is under pressure. Automation is increasing. Direct labor is shrinking. Customers are complaining. A new machine may make the distortion worse.</p>
+
+              <div class="callout">
+                <strong>Your mission:</strong> diagnose the cost-system problem, compare three costing designs, decide how to handle the new machine, and defend a recommendation.
+              </div>
+
+              <div class="warning callout">
+                <strong>Copyright-safe use:</strong> this file does not reproduce the HBS case. Students should read the licensed case separately. Replace or adjust wording if your institution has specific HBSP/LMS rules.
+              </div>
+
+              <div class="grid2" style="margin-top: 14px;">
+                <div>
+                  <label for="studentName">Student name</label>
+                  <input id="studentName" placeholder="Example: Prince Doliya" />
+                </div>
+                <div>
+                  <label for="rollNo">Roll number / student ID</label>
+                  <input id="rollNo" placeholder="Example: PGP/2026/001" />
+                </div>
+                <div>
+                  <label for="studentEmail">Email</label>
+                  <input id="studentEmail" type="email" placeholder="Example: student@institute.edu" />
+                </div>
+                <div>
+                  <label for="teamName">Team name</label>
+                  <input id="teamName" placeholder="Example: Team Main Test Room" />
+                </div>
+                <div>
+                  <label for="studentRole">Primary role</label>
+                  <select id="studentRole">
+                    <option value="">Choose role</option>
+                    <option>ETO Manager</option>
+                    <option>Accounting Manager</option>
+                    <option>Consultant</option>
+                    <option>Customer Division CFO</option>
+                    <option>Corporate Controller</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="btnrow">
+                <button onclick="startGame()">Start game</button>
+                <button class="secondary" onclick="showInstructorMode()">Instructor preview</button>
+              </div>
+            </div>
+
+            <div class="panel">
+              <h3>Learning targets</h3>
+              <div class="mini">
+                <div class="minirow"><span>Cost-system obsolescence</span><strong>High</strong></div>
+                <div class="minirow"><span>Two-stage allocation</span><strong>High</strong></div>
+                <div class="minirow"><span>Labor vs machine-hour drivers</span><strong>High</strong></div>
+                <div class="minirow"><span>Strategic distortion from costing</span><strong>High</strong></div>
+                <div class="minirow"><span>New-machine cost-center decision</span><strong>High</strong></div>
+              </div>
+
+              <div class="callout good">
+                <strong>Suggested class flow:</strong> 15 minutes individual/team play, 20 minutes breakout defense, 30 minutes full-class debrief.
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="screen" id="screen1">
+          <h2>Round 1 - Diagnose why the old system is failing</h2>
+          <p>Select all reasons that help explain why a labor-based burden rate can become misleading in this situation.</p>
+
+          <div class="grid2" id="diagnosisChoices">
+            <div class="choice" data-correct="true" onclick="toggleMulti(this)">
+              <span class="tag">Driver mismatch</span>
+              <h3>Overhead is no longer consumed in proportion to direct labor.</h3>
+              <p class="small">Automation and technical support make direct labor a weaker proxy for resource consumption.</p>
+            </div>
+            <div class="choice" data-correct="true" onclick="toggleMulti(this)">
+              <span class="tag">Product diversity</span>
+              <h3>Different products use very different combinations of main-room and mechanical-room resources.</h3>
+              <p class="small">A single average rate hides resource-use differences across lots.</p>
+            </div>
+            <div class="choice" data-correct="true" onclick="toggleMulti(this)">
+              <span class="tag">Technology shift</span>
+              <h3>More automated testing increases depreciation and machine-related burden.</h3>
+              <p class="small">The denominator, direct labor dollars, shrinks while overhead remains large or grows.</p>
+            </div>
+            <div class="choice" data-correct="true" onclick="toggleMulti(this)">
+              <span class="tag">Strategic distortion</span>
+              <h3>Some work may look cheaper or more expensive than it really is.</h3>
+              <p class="small">The system can attract the wrong work and repel the right work.</p>
+            </div>
+            <div class="choice" data-correct="false" onclick="toggleMulti(this)">
+              <span class="tag">Red herring</span>
+              <h3>The problem is mainly that direct labor wages are too high.</h3>
+              <p class="small">Wages matter, but the deeper issue is allocation logic.</p>
+            </div>
+            <div class="choice" data-correct="false" onclick="toggleMulti(this)">
+              <span class="tag">Red herring</span>
+              <h3>The cost system fails because ETO has no direct materials.</h3>
+              <p class="small">No direct materials is not the core reason the burden allocation is distorted.</p>
+            </div>
+          </div>
+
+          <div class="btnrow">
+            <button onclick="scoreDiagnosis()">Submit diagnosis</button>
+            <button class="secondary" onclick="goTo(0)">Back</button>
+          </div>
+          <div class="feedback" id="diagnosisFeedback"></div>
+        </section>
+
+        <section class="screen" id="screen2">
+          <h2>Round 2 - Costing battle</h2>
+          <p>First, predict which products the old one-center system makes look too cheap. Then reveal the costing table.</p>
+
+          <div class="grid2" id="underChoices">
+            <div class="choice" data-product="ICA" data-correct="true" onclick="toggleMulti(this)">
+              <span class="tag">Integrated circuit A</span>
+              <h3>ICA</h3>
+              <p class="small">Main room: 8.5 hours; mechanical room: 10.0 hours.</p>
+            </div>
+            <div class="choice" data-product="ICB" data-correct="true" onclick="toggleMulti(this)">
+              <span class="tag">Integrated circuit B</span>
+              <h3>ICB</h3>
+              <p class="small">Main room: 14.0 hours; mechanical room: 26.0 hours.</p>
+            </div>
+            <div class="choice" data-product="CAPACITOR" data-correct="false" onclick="toggleMulti(this)">
+              <span class="tag">Passive component</span>
+              <h3>Capacitor</h3>
+              <p class="small">Relatively high direct labor dollars compared with machine hours.</p>
+            </div>
+            <div class="choice" data-product="AMPLIFIER" data-correct="false" onclick="toggleMulti(this)">
+              <span class="tag">Amplifier</span>
+              <h3>Amplifier</h3>
+              <p class="small">Low total machine hours.</p>
+            </div>
+            <div class="choice" data-product="DIODE" data-correct="true" onclick="toggleMulti(this)">
+              <span class="tag">Diode</span>
+              <h3>Diode</h3>
+              <p class="small">Machine hours are relatively high compared with direct labor dollars.</p>
+            </div>
+          </div>
+
+          <div class="btnrow">
+            <button onclick="scoreUndercosting()">Submit prediction</button>
+            <button class="secondary" onclick="renderCostTable(true)">Reveal costing table</button>
+            <button class="secondary" onclick="goTo(1)">Back</button>
+          </div>
+
+          <div class="feedback" id="underFeedback"></div>
+
+          <div id="costTableWrap" class="hidden" style="margin-top: 18px;">
+            <h3>Cost comparison by product</h3>
+            <p class="small">Existing = direct labor plus 145% burden. Two-center = direct labor plus 20% admin/technical plus $80 per total machine hour. Three-center = direct labor plus 20% admin/technical plus separate main-room and mechanical-room rates.</p>
+            <div style="overflow-x:auto;">
+              <table id="costTable"></table>
+            </div>
+          </div>
+        </section>
+
+        <section class="screen" id="screen3">
+          <h2>Round 3 - Choose the cost system</h2>
+          <p>The board wants a recommendation. Which cost system should ETO use for product/lot costing?</p>
+
+          <div class="grid2" id="systemChoices">
+            <div class="choice" data-score="5" onclick="selectSingle(this, 'systemChoices')">
+              <span class="tag">Conservative</span>
+              <h3>Keep the existing one-center labor-based system.</h3>
+              <p class="small">Low disruption, but the distortion continues and may worsen with automation.</p>
+            </div>
+            <div class="choice" data-score="22" onclick="selectSingle(this, 'systemChoices')">
+              <span class="tag">Better driver</span>
+              <h3>Adopt the accounting manager's two-center system.</h3>
+              <p class="small">Good improvement: separates admin/technical and machine-hour-driven test-room burden.</p>
+            </div>
+            <div class="choice" data-score="30" onclick="selectSingle(this, 'systemChoices')">
+              <span class="tag">Best among given options</span>
+              <h3>Adopt the consultant's three-center system.</h3>
+              <p class="small">Better captures the different economics of main-room and mechanical-room testing.</p>
+            </div>
+            <div class="choice" data-score="18" onclick="selectSingle(this, 'systemChoices')">
+              <span class="tag">Ambitious</span>
+              <h3>Create a very detailed ABC system immediately.</h3>
+              <p class="small">Conceptually attractive, but may be too costly and complex for the immediate decision.</p>
+            </div>
+          </div>
+
+          <div>
+            <label for="systemJustification" style="margin-top: 14px;">One-sentence defense</label>
+            <textarea id="systemJustification" placeholder="Example: I recommend the three-center system because..."></textarea>
+          </div>
+
+          <div class="btnrow">
+            <button onclick="scoreSystemChoice()">Submit system decision</button>
+            <button class="secondary" onclick="goTo(2)">Back</button>
+          </div>
+          <div class="feedback" id="systemFeedback"></div>
+        </section>
+
+        <section class="screen" id="screen4">
+          <h2>Round 4 - The new-machine problem</h2>
+          <p>A new automated machine could add major capability. But it is expensive, lightly used in the early years, and needed mainly for one or two customers. How should ETO treat it for costing?</p>
+
+          <div class="grid2">
+            <div class="panel">
+              <h3>Machine facts for the game</h3>
+              <div class="mini">
+                <div class="minirow"><span>Acquisition cost</span><strong>$2,000,000</strong></div>
+                <div class="minirow"><span>Useful life</span><strong>8 years</strong></div>
+                <div class="minirow"><span>First-year depreciation</span><strong>$500,000</strong></div>
+                <div class="minirow"><span>First-year use</span><strong>400 hours</strong></div>
+                <div class="minirow"><span>Later use</span><strong>2,400 hours</strong></div>
+                <div class="minirow"><span>Other overhead</span><strong>$250,000</strong></div>
+              </div>
+            </div>
+
+            <div class="panel">
+              <h3>Rate simulator</h3>
+              <p class="small">Use this to see why "just put it in the main room" is dangerous.</p>
+              <div class="mini">
+                <div class="minirow"><span>Main room without machine</span><strong>$63/hr approx.</strong></div>
+                <div class="minirow"><span>Main room if machine is pooled, year 1</span><strong>$87.67/hr approx.</strong></div>
+                <div class="minirow"><span>New machine separate, year 1</span><strong>$2,062.50/hr approx.</strong></div>
+                <div class="minirow"><span>New machine separate, later years</span><strong>$154.17/hr approx.</strong></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid2" id="machineChoices" style="margin-top: 14px;">
+            <div class="choice" data-score="5" onclick="selectSingle(this, 'machineChoices')">
+              <span class="tag">Pool everything</span>
+              <h3>Add the machine to the existing one-center pool.</h3>
+              <p class="small">This spreads machine costs to customers who do not use it. Very poor fit.</p>
+            </div>
+            <div class="choice" data-score="12" onclick="selectSingle(this, 'machineChoices')">
+              <span class="tag">Main room pool</span>
+              <h3>Add the machine to the main test-room pool.</h3>
+              <p class="small">Better than one pool, but still distorts main-room rates for other customers.</p>
+            </div>
+            <div class="choice" data-score="25" onclick="selectSingle(this, 'machineChoices')">
+              <span class="tag">Separate center</span>
+              <h3>Make the new machine a separate cost center.</h3>
+              <p class="small">Costs follow users of the machine, not everyone else.</p>
+            </div>
+            <div class="choice" data-score="30" onclick="selectSingle(this, 'machineChoices')">
+              <span class="tag">Best practical answer</span>
+              <h3>Separate cost center, with careful treatment of start-up and low-utilization effects.</h3>
+              <p class="small">Separates the machine and avoids making first-year underuse mechanically drive absurd pricing.</p>
+            </div>
+          </div>
+
+          <div class="btnrow">
+            <button onclick="scoreMachineChoice()">Submit machine decision</button>
+            <button class="secondary" onclick="goTo(3)">Back</button>
+          </div>
+          <div class="feedback" id="machineFeedback"></div>
+        </section>
+
+        <section class="screen" id="screen5">
+          <h2>Round 5 - Final board recommendation</h2>
+          <p>Write the recommendation you would defend in class. This is the part students present after the game.</p>
+
+          <div class="grid2">
+            <div>
+              <label for="finalRec">Recommendation</label>
+              <textarea id="finalRec" placeholder="I recommend..."></textarea>
+            </div>
+            <div>
+              <label for="riskNote">Main risk / caveat</label>
+              <textarea id="riskNote" placeholder="The main risk is..."></textarea>
+            </div>
+          </div>
+
+          <div class="grid3" id="recChoices" style="margin-top: 14px;">
+            <div class="choice" data-score="10" onclick="selectSingle(this, 'recChoices')">
+              <span class="tag">Weak</span>
+              <h3>One-center system; no special machine treatment.</h3>
+              <p class="small">Simple, but ignores the fundamental economics.</p>
+            </div>
+            <div class="choice" data-score="22" onclick="selectSingle(this, 'recChoices')">
+              <span class="tag">Solid</span>
+              <h3>Two-center system now; review after machine acquisition.</h3>
+              <p class="small">Defensible transition, but weaker than three-center for product diversity.</p>
+            </div>
+            <div class="choice" data-score="30" onclick="selectSingle(this, 'recChoices')">
+              <span class="tag">Strong</span>
+              <h3>Three-center system plus separate new-machine center.</h3>
+              <p class="small">Best balance of accuracy, feasibility, and strategic usefulness.</p>
+            </div>
+          </div>
+
+          <div class="btnrow">
+            <button onclick="scoreFinalRec()">Submit final recommendation</button>
+            <button class="secondary" onclick="goTo(4)">Back</button>
+          </div>
+          <div class="feedback" id="recFeedback"></div>
+        </section>
+
+        <section class="screen" id="screen6">
+          <h2>Final result</h2>
+          <div class="grid2">
+            <div class="resultcard">
+              <div class="confetti" id="badgeIcon">◆</div>
+              <h3 id="badgeTitle">Result</h3>
+              <p id="badgeText"></p>
+              <div class="scorebox">
+                <div class="small">Final score</div>
+                <div><span class="scorebig" id="finalScore">0</span><span class="small"> / 120</span></div>
+              </div>
+            </div>
+
+            <div class="resultcard">
+              <h3>Debrief prompts</h3>
+              <ol>
+                <li>Which products were strategically mispriced by the old system?</li>
+                <li>What did the two-center system fix, and what did it still average away?</li>
+                <li>Why is the mechanical test room economically different from the main test room?</li>
+                <li>Should first-year low utilization be passed fully to the first users of the new machine?</li>
+                <li>What is the decision-use of product cost here: pricing, outsourcing, capacity, or strategy?</li>
+              </ol>
+            </div>
+          </div>
+
+          <div class="resultcard" style="margin-top: 14px;">
+            <h3>Team response summary</h3>
+            <pre id="summaryBox" style="white-space: pre-wrap; background:#f8fafc; padding:14px; border-radius:12px; border:1px solid var(--line);"></pre>
+          </div>
+
+          <div class="btnrow">
+            <button onclick="downloadSummary()">Download team summary</button>
+            <button class="secondary" onclick="window.print()">Print result</button>
+            <button class="secondary" onclick="restart()">Restart</button>
+          </div>
+        </section>
+
+        <section class="screen" id="screenInstructor">
+          <h2>Instructor preview</h2>
+          <p>This screen gives you the logic of the game before class.</p>
+          <div class="grid2">
+            <div class="panel">
+              <h3>Scoring logic</h3>
+              <ul>
+                <li>Round 1: diagnosis, 20 points.</li>
+                <li>Round 2: undercosting prediction, 20 points.</li>
+                <li>Round 3: cost-system selection, 30 points.</li>
+                <li>Round 4: new-machine treatment, 30 points.</li>
+                <li>Round 5: final recommendation, 20 points.</li>
+              </ul>
+            </div>
+            <div class="panel">
+              <h3>Expected strong answer</h3>
+              <p>Students should move away from one facilitywide labor-based allocation. The three-center system is stronger than the two-center system because main testing and mechanical testing have different burden economics. The new machine should not be buried in a common pool; it needs separate treatment, with judgment around start-up costs, depreciation, and low first-year utilization.</p>
+            </div>
+          </div>
+          <div class="btnrow">
+            <button onclick="goTo(0)">Return to welcome</button>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+<script>
+const steps = [
+  "Setup",
+  "Diagnose",
+  "Costing battle",
+  "Choose system",
+  "New machine",
+  "Board recommendation",
+  "Result"
+];
+
+const products = [
+  { name: "ICA", dl: 917, main: 8.5, mech: 10.0 },
+  { name: "ICB", dl: 2051, main: 14.0, mech: 26.0 },
+  { name: "Capacitor", dl: 1094, main: 3.0, mech: 4.5 },
+  { name: "Amplifier", dl: 525, main: 4.0, mech: 1.0 },
+  { name: "Diode", dl: 519, main: 7.0, mech: 5.0 }
+];
+
+
+const SCORE_ENDPOINT = "https://script.google.com/macros/s/AKfycbxcykwNbJrqfe75LeZbx6yNdqyirpqY1mjDvqsN5oTzQ70ZkDq2ZZRyFUDIXtTOZJ92/exec";
+
+function safeValue(id) {
+  const el = document.getElementById(id);
+  return el ? el.value.trim() : "";
+}
+
+function submitScoreToGoogleSheet() {
+  if (!SCORE_ENDPOINT || SCORE_ENDPOINT.includes("PASTE_GOOGLE_APPS_SCRIPT")) {
+    console.warn("Google Apps Script URL not configured.");
+    return;
+  }
+
+  const payload = new URLSearchParams({
+    timestamp_client: new Date().toISOString(),
+    name: safeValue("studentName"),
+    roll_no: safeValue("rollNo"),
+    email: safeValue("studentEmail"),
+    team: state.team || safeValue("teamName"),
+    role: state.role || safeValue("studentRole"),
+    score: String(state.score),
+    max_score: "120",
+    percentage: String(Math.round((state.score / 120) * 100)),
+    status: state.score >= 78 ? "Passed" : "Completed",
+    system_defense: state.systemText || "",
+    machine_decision: state.machineText || "",
+    final_recommendation: state.finalText || "",
+    risk_note: state.riskText || "",
+    user_agent: navigator.userAgent
+  });
+
+  fetch(SCORE_ENDPOINT, {
+    method: "POST",
+    mode: "no-cors",
+    headers: { "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8" },
+    body: payload
+  }).catch(err => console.error("Score submission failed:", err));
+}
+
+const state = {
+  screen: 0,
+  score: 0,
+  awarded: {},
+  team: "",
+  role: "",
+  systemText: "",
+  machineText: "",
+  finalText: "",
+  riskText: ""
+};
+
+function money(n) {
+  return "$" + Math.round(n).toLocaleString();
+}
+
+function calcCosts(p) {
+  const existing = p.dl * 2.45;
+  const two = p.dl * 1.20 + 80 * (p.main + p.mech);
+  const three = p.dl * 1.20 + 63 * p.main + 113 * p.mech;
+  return { existing, two, three };
+}
+
+function initProgress() {
+  const wrap = document.getElementById("progress");
+  wrap.innerHTML = steps.map((s, i) => `
+    <div class="step ${i === state.screen ? "active" : ""}" id="step${i}">
+      <div class="dot">${i}</div>
+      <div>${s}</div>
+    </div>
+  `).join("");
+}
+
+function updateProgress() {
+  steps.forEach((_, i) => {
+    const el = document.getElementById("step" + i);
+    if (!el) return;
+    el.className = "step" + (i === state.screen ? " active" : "") + (i < state.screen ? " done" : "");
+  });
+  document.getElementById("scoreNow").innerText = state.score;
+  document.getElementById("scoreBar").style.width = Math.min(100, state.score / 120 * 100) + "%";
+  document.getElementById("sideTeam").innerText = state.team || "Not set";
+  document.getElementById("sideRole").innerText = state.role || "Role not selected";
+}
+
+function goTo(n) {
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  const id = "screen" + n;
+  document.getElementById(id).classList.add("active");
+  state.screen = n;
+  updateProgress();
+}
+
+function showInstructorMode() {
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  document.getElementById("screenInstructor").classList.add("active");
+}
+
+function startGame() {
+  const name = safeValue("studentName");
+  const roll = safeValue("rollNo");
+  if (!name || !roll) {
+    alert("Please enter student name and roll number before starting.");
+    return;
+  }
+  state.team = document.getElementById("teamName").value.trim() || "Unnamed team";
+  state.role = document.getElementById("studentRole").value || "Role not selected";
+  goTo(1);
+}
+
+function toggleMulti(el) {
+  el.classList.toggle("selected");
+}
+
+function selectSingle(el, groupId) {
+  document.querySelectorAll("#" + groupId + " .choice").forEach(c => c.classList.remove("selected"));
+  el.classList.add("selected");
+}
+
+function award(key, points) {
+  if (state.awarded[key]) return false;
+  state.awarded[key] = points;
+  state.score += points;
+  updateProgress();
+  return true;
+}
+
+function scoreDiagnosis() {
+  const choices = [...document.querySelectorAll("#diagnosisChoices .choice")];
+  let raw = 0;
+  choices.forEach(c => {
+    const selected = c.classList.contains("selected");
+    const correct = c.dataset.correct === "true";
+    c.classList.remove("correct", "wrong");
+    if (selected && correct) { raw += 5; c.classList.add("correct"); }
+    if (selected && !correct) { raw -= 3; c.classList.add("wrong"); }
+    if (!selected && correct) { c.classList.add("wrong"); }
+  });
+  const points = Math.max(0, Math.min(20, raw));
+  award("diagnosis", points);
+  const fb = document.getElementById("diagnosisFeedback");
+  fb.classList.add("show");
+  fb.innerHTML = `<strong>Round score: ${points}/20.</strong><br>
+    Strong diagnosis: the labor-based system fails because the relationship between direct labor and overhead has changed. More product diversity, automation, engineering support, and machine intensity make one average burden rate increasingly misleading.`;
+  setTimeout(() => goTo(2), 1100);
+}
+
+function scoreUndercosting() {
+  const choices = [...document.querySelectorAll("#underChoices .choice")];
+  let raw = 0;
+  choices.forEach(c => {
+    const selected = c.classList.contains("selected");
+    const correct = c.dataset.correct === "true";
+    c.classList.remove("correct", "wrong");
+    if (selected && correct) { raw += 7; c.classList.add("correct"); }
+    if (selected && !correct) { raw -= 4; c.classList.add("wrong"); }
+    if (!selected && correct) { c.classList.add("wrong"); }
+  });
+  const points = Math.max(0, Math.min(20, raw));
+  award("undercosting", points);
+  const fb = document.getElementById("underFeedback");
+  fb.classList.add("show");
+  fb.innerHTML = `<strong>Round score: ${points}/20.</strong><br>
+    The old system tends to undercost products that consume more machine-room resources relative to labor dollars: ICA, ICB, and Diode. It tends to overcost Capacitor and Amplifier.`;
+  renderCostTable(true);
+  setTimeout(() => goTo(3), 1600);
+}
+
+function renderCostTable(show) {
+  const wrap = document.getElementById("costTableWrap");
+  if (show) wrap.classList.remove("hidden");
+  const rows = products.map(p => {
+    const c = calcCosts(p);
+    const delta = c.three - c.existing;
+    const deltaClass = delta >= 0 ? "delta-up" : "delta-down";
+    const label = delta >= 0 ? "Old system lower" : "Old system higher";
+    return `
+      <tr>
+        <td><strong>${p.name}</strong></td>
+        <td>${money(p.dl)}</td>
+        <td>${p.main}</td>
+        <td>${p.mech}</td>
+        <td>${money(c.existing)}</td>
+        <td>${money(c.two)}</td>
+        <td>${money(c.three)}</td>
+        <td class="${deltaClass}">${label}: ${money(Math.abs(delta))}</td>
+      </tr>
+    `;
+  }).join("");
+
+  document.getElementById("costTable").innerHTML = `
+    <thead>
+      <tr>
+        <th>Product</th>
+        <th>Direct labor</th>
+        <th>Main MH</th>
+        <th>Mech MH</th>
+        <th>One-center</th>
+        <th>Two-center</th>
+        <th>Three-center</th>
+        <th>Old vs three-center</th>
+      </tr>
+    </thead>
+    <tbody>${rows}</tbody>
+  `;
+}
+
+function scoreSystemChoice() {
+  const selected = document.querySelector("#systemChoices .choice.selected");
+  if (!selected) {
+    alert("Please select one cost system.");
+    return;
+  }
+  const points = Number(selected.dataset.score);
+  state.systemText = document.getElementById("systemJustification").value.trim();
+  award("system", points);
+  const fb = document.getElementById("systemFeedback");
+  fb.classList.add("show");
+  if (points === 30) {
+    fb.innerHTML = `<strong>Round score: ${points}/30.</strong><br>Good. The three-center system better reflects the resource economics of main-room and mechanical-room work while keeping the system teachable and feasible.`;
+  } else if (points >= 22) {
+    fb.innerHTML = `<strong>Round score: ${points}/30.</strong><br>Reasonable transition. The two-center system fixes part of the driver mismatch, but still averages main-room and mechanical-room economics together.`;
+  } else {
+    fb.innerHTML = `<strong>Round score: ${points}/30.</strong><br>This decision leaves too much distortion in the system. The old labor-based pool is the source of the strategic problem.`;
+  }
+  setTimeout(() => goTo(4), 1300);
+}
+
+function scoreMachineChoice() {
+  const selected = document.querySelector("#machineChoices .choice.selected");
+  if (!selected) {
+    alert("Please select one machine treatment.");
+    return;
+  }
+  const points = Number(selected.dataset.score);
+  state.machineText = selected.querySelector("h3").innerText;
+  award("machine", points);
+  const fb = document.getElementById("machineFeedback");
+  fb.classList.add("show");
+  if (points === 30) {
+    fb.innerHTML = `<strong>Round score: ${points}/30.</strong><br>Strong. The new machine has different economics and limited early users. Separate treatment avoids cross-subsidizing customers who do not use it, while judgment prevents first-year utilization from creating absurd rates.`;
+  } else if (points >= 25) {
+    fb.innerHTML = `<strong>Round score: ${points}/30.</strong><br>Good. A separate cost center is the key move. You should still discuss start-up costs, depreciation method, and normal capacity.`;
+  } else {
+    fb.innerHTML = `<strong>Round score: ${points}/30.</strong><br>Weak. Pooling the machine pushes its costs onto other customers and can make unrelated work look artificially expensive.`;
+  }
+  setTimeout(() => goTo(5), 1500);
+}
+
+function scoreFinalRec() {
+  const selected = document.querySelector("#recChoices .choice.selected");
+  if (!selected) {
+    alert("Please select the final recommendation package.");
+    return;
+  }
+  state.finalText = document.getElementById("finalRec").value.trim();
+  state.riskText = document.getElementById("riskNote").value.trim();
+  let points = Number(selected.dataset.score);
+  if (state.finalText.length > 45) points += 5;
+  if (state.riskText.length > 35) points += 5;
+  points = Math.min(20, points); 
+  // Normalized to keep total max at 120: the selected packages above are strategic labels, but final score is capped.
+  if (selected.dataset.score === "30") points = 20;
+  if (selected.dataset.score === "22") points = Math.max(points, 16);
+  if (selected.dataset.score === "10") points = Math.min(points, 10);
+
+  award("final", points);
+  const fb = document.getElementById("recFeedback");
+  fb.classList.add("show");
+  fb.innerHTML = `<strong>Round score: ${points}/20.</strong><br>The strongest classroom answer links the costing design to strategy: pricing, customer retention, product mix, capacity use, and future automation.`;
+  setTimeout(showResult, 900);
+}
+
+function showResult() {
+  goTo(6);
+  const score = state.score;
+  document.getElementById("finalScore").innerText = score;
+  submitScoreToGoogleSheet();
+
+  let title, text, icon;
+  if (score >= 100) {
+    title = "Board-ready recommendation";
+    text = "Excellent. Your team recognized both the costing mechanics and the strategic consequences of miscosting.";
+    icon = "◆";
+  } else if (score >= 78) {
+    title = "Good managerial judgment";
+    text = "Solid. Your recommendation is mostly defensible, but the debrief should sharpen the link between cost drivers and strategic distortion.";
+    icon = "◇";
+  } else {
+    title = "Needs a stronger cost logic";
+    text = "You saw pieces of the issue, but your recommendation needs a clearer allocation logic and a stronger machine-cost treatment.";
+    icon = "△";
+  }
+
+  document.getElementById("badgeTitle").innerText = title;
+  document.getElementById("badgeText").innerText = text;
+  document.getElementById("badgeIcon").innerText = icon;
+
+  const summary = [
+    "SELIGRAM ETO COST-SYSTEM CHALLENGE - TEAM SUMMARY",
+    "",
+    "Name: " + (safeValue("studentName") || "Not set"),
+    "Roll No: " + (safeValue("rollNo") || "Not set"),
+    "Email: " + (safeValue("studentEmail") || "Not set"),
+    "Team: " + (state.team || "Not set"),
+    "Role: " + (state.role || "Not selected"),
+    "Final score: " + score + " / 120",
+    "",
+    "System defense:",
+    state.systemText || "(No written defense entered.)",
+    "",
+    "Machine decision:",
+    state.machineText || "(No machine decision recorded.)",
+    "",
+    "Final recommendation:",
+    state.finalText || "(No recommendation entered.)",
+    "",
+    "Main risk / caveat:",
+    state.riskText || "(No caveat entered.)",
+    "",
+    "Class debrief focus:",
+    "- Why direct labor stopped being a reliable overhead driver.",
+    "- Why product diversity makes one average rate dangerous.",
+    "- Why the three-center system improves cost visibility.",
+    "- Why the new machine should be treated separately.",
+    "- How reported product costs can change customer and product-mix strategy."
+  ].join("\n");
+
+  document.getElementById("summaryBox").innerText = summary;
+}
+
+function downloadSummary() {
+  const text = document.getElementById("summaryBox").innerText || "No summary available.";
+  const blob = new Blob([text], { type: "text/plain" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "seligram-eto-team-summary.txt";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function restart() {
+  state.screen = 0;
+  state.score = 0;
+  state.awarded = {};
+  state.systemText = "";
+  state.machineText = "";
+  state.finalText = "";
+  state.riskText = "";
+  document.querySelectorAll(".choice").forEach(c => c.classList.remove("selected", "correct", "wrong"));
+  document.querySelectorAll(".feedback").forEach(f => { f.classList.remove("show"); f.innerHTML = ""; });
+  document.getElementById("costTableWrap").classList.add("hidden");
+  document.getElementById("systemJustification").value = "";
+  document.getElementById("finalRec").value = "";
+  document.getElementById("riskNote").value = "";
+  goTo(0);
+}
+
+initProgress();
+updateProgress();
+renderCostTable(false);
+</script>
+</body>
+</html>
